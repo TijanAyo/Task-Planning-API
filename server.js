@@ -10,9 +10,11 @@ app.use(express.urlencoded({extended:false}));
 
 // route
 const goalroute = require('./routes/goalRoutes');
+const userroute = require('./routes/userRoutes')
 
 // Using route
 app.use(goalroute);
+app.use('/api', userroute);
 
 // connecting to mongoDB
 connectDB();
