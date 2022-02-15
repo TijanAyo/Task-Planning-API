@@ -13,7 +13,7 @@ const getStatus = (req, res) =>{
 // @desc: List out all goals
 // @route: GET /api/goals
 const getGoals = async (req, res) =>{
-    const goals = await Goal.find()
+    const goals = await Goal.find().sort('-createdAt')
 
     res.status(200).json(goals);
 }
