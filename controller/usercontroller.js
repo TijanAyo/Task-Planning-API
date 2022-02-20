@@ -35,8 +35,9 @@ const registerUser = async (req, res)=>{
 
     // Condition if user is created
     if(user) {
-        res.status(201).send({
-            message: "User Created"
+        res.status(201).json({
+            message: "User Created",
+            token: generateToken(user.id)
         })
     }else{
         res.status(400).send({
@@ -55,7 +56,9 @@ const loginUser = async (req, res)=>{
     const {email , password }=  req.body
 
     if(!email || !password){
-        res.status(400).send({error: 'Input User Credentials'})
+        res.status(400).send({
+            error: 'Input User Credentials: "email and password not found"'
+        })
     }
     
     // check for user email in db
@@ -63,7 +66,8 @@ const loginUser = async (req, res)=>{
 
     if(user && (await bcrypt.compare(password, user.password))) {
         res.json({
-            message: `${user.name} is now logged in`
+            message: `${user.name} is now logged in`,
+            token: generateToken(user.id)
         })
     }else{
         res.status(400).send({
@@ -74,9 +78,24 @@ const loginUser = async (req, res)=>{
 
 // @desc: Get user data
 // @route: GET /api/user/me
-const getMe = (req, res) =>{
-    res.status(200).json({message: 'Display this USER data'})
+// @access: Private
+const getMe = async (req, res) =>{
+    const {id, name, email } = await User.findById(req.user.id)
+
+    res.status(200).json({
+        id,
+        name,
+        email
+    })
 }
+
+// Generate JWT
+const generateToken = (id) =>{
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '1d',
+    })
+}
+
 
 module.exports = {
     registerUser, loginUser, getMe
